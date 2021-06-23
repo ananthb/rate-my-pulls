@@ -31,9 +31,9 @@ import (
 	"net/http/httputil"
 	"os"
 
-	firebase "firebase.google.com/go"
-	firestoregorilla "github.com/GoogleCloudPlatform/firestore-gorilla-sessions"
+	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/sessions"
+	"github.com/rbcervilla/redisstore/v8"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -51,7 +51,6 @@ var (
 		Endpoint:     github.Endpoint,
 		Scopes:       []string{"user:email", "repo"},
 	}
-	cloudProject = os.Getenv("GOOGLE_CLOUD_PROJECT")
 	sessionStore sessions.Store
 
 	// errors
@@ -59,26 +58,6 @@ var (
 	stateMissingErr    = errors.New("no state value in session")
 	stateDecodeErr     = errors.New("error decoding state from session")
 )
-
-func init() {
-	ctx := context.Background()
-
-	conf := &firebase.Config{ProjectID: cloudProject}
-	app, err := firebase.NewApp(ctx, conf)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	client, err := app.Firestore(ctx)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	sessionStore, err = firestoregorilla.New(ctx, client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-}
 
 func randomState(n int) string {
 	data := make([]byte, n)
@@ -171,6 +150,16 @@ func apiDirector(r *http.Request) {
 }
 
 func main() {
+	opts, err := redis.ParseURL(os.Getenv("FLY_REDIS_CACHE_URL"))
+	if err != nil {
+		log.Fatal("failed to parse redis url: ", err)
+	}
+	client := redis.NewClient(opts)
+
+	if sessionStore, err = redisstore.NewRedisStore(context.Background(), client); err != nil {
+		log.Fatal("failed to create redis session store: ", err)
+	}
+
 	// url handlers
 	http.HandleFunc("/auth", auth)
 	http.HandleFunc("/auth/callback", authCallback)
