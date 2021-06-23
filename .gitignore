@@ -1,0 +1,4 @@
+node_modules
+elm-stuff
+public/*.js*
+google_credentials.json

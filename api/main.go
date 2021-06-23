@@ -1,0 +1,190 @@
+/* Copyright 2020, Ananth Bhaskararaman
+
+   This file is part of Rate My Pulls.
+
+   Rate My Pulls is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Affero General Public License as
+	 published by the Free Software Foundation, either version 3 of
+	 the License, or any later version.
+
+   Rate My Pulls is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU Affero General Public License for more details.
+
+   You should have received a copy of the GNU Affero General Public
+	 License along with Foobar.  If not, see
+	 <https://www.gnu.org/licenses/>.
+*/
+
+package main
+
+import (
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"io"
+	"log"
+	"net/http"
+	"net/http/httputil"
+	"os"
+
+	firebase "firebase.google.com/go"
+	firestoregorilla "github.com/GoogleCloudPlatform/firestore-gorilla-sessions"
+	"github.com/gorilla/sessions"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/github"
+)
+
+const (
+	sessionName   = "auth"
+	oauthTokenKey = "oauth_token"
+	oauthStateKey = "oauth_state"
+)
+
+var (
+	oauthConf = &oauth2.Config{
+		ClientID:     os.Getenv("RMP_GITHUB_CLIENT_ID"),
+		ClientSecret: os.Getenv("RMP_GITHUB_CLIENT_SECRET"),
+		Endpoint:     github.Endpoint,
+		Scopes:       []string{"user:email", "repo"},
+	}
+	cloudProject = os.Getenv("GOOGLE_CLOUD_PROJECT")
+	sessionStore sessions.Store
+
+	// errors
+	mismatchedStateErr = errors.New("state does not match saved value from session")
+	stateMissingErr    = errors.New("no state value in session")
+	stateDecodeErr     = errors.New("error decoding state from session")
+)
+
+func init() {
+	ctx := context.Background()
+
+	conf := &firebase.Config{ProjectID: cloudProject}
+	app, err := firebase.NewApp(ctx, conf)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	sessionStore, err = firestoregorilla.New(ctx, client)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func randomState(n int) string {
+	data := make([]byte, n)
+	if _, err := io.ReadFull(rand.Reader, data); err != nil {
+		panic(err)
+	}
+	return base64.StdEncoding.EncodeToString(data)
+}
+
+func auth(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.New(r, sessionName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	session.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   86400 * 7,
+		Secure:   true,
+		HttpOnly: true,
+	}
+
+	state := randomState(32)
+	session.Values[oauthStateKey] = state
+	if err := session.Save(r, w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	url := oauthConf.AuthCodeURL(state, oauth2.AccessTypeOnline)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func authCallback(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, sessionName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var savedState string
+	if rawState, ok := session.Values[oauthStateKey]; !ok {
+		http.Error(w, stateMissingErr.Error(), http.StatusInternalServerError)
+		return
+	} else {
+		if savedState, ok = rawState.(string); !ok {
+			http.Error(w, stateDecodeErr.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	state := r.URL.Query().Get("state")
+	if state != savedState {
+		http.Error(w, mismatchedStateErr.Error(), http.StatusForbidden)
+		return
+	}
+
+	code := r.URL.Query().Get("code")
+	token, err := oauthConf.Exchange(context.Background(), code)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	session.Values[oauthTokenKey] = token
+	delete(session.Values, oauthStateKey)
+	if err := session.Save(r, w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+
+func apiDirector(r *http.Request) {
+	session, err := sessionStore.Get(r, sessionName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if rawToken, ok := session.Values[oauthTokenKey]; ok {
+		if rawTokenBytes, err := json.Marshal(rawToken); err == nil {
+			var token oauth2.Token
+			if err := json.Unmarshal(rawTokenBytes, &token); err == nil {
+				token.SetAuthHeader(r)
+			}
+		}
+	}
+	const host = "api.github.com"
+	r.Host = host
+	r.URL.Host = host
+	r.URL.Scheme = "https"
+	r.URL.Path = "/graphql"
+}
+
+func main() {
+	// url handlers
+	http.HandleFunc("/auth", auth)
+	http.HandleFunc("/auth/callback", authCallback)
+	http.Handle("/api", &httputil.ReverseProxy{
+		Director: apiDirector,
+	})
+
+	var address string
+	if port := os.Getenv("PORT"); port == "" {
+		address = "localhost:8080"
+	} else {
+		address = ":" + port
+	}
+
+	log.Println("starting the server on: ", address)
+	log.Fatal(http.ListenAndServe(address, nil))
+}

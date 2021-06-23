@@ -1,0 +1,30 @@
+@charset "UTF-8";
+
+#site-header {
+  margin: 1rem;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  width: 100vw;
+}
+
+#site-nav {
+  margin: 1rem;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+}
+
+#site-nav>.nes-btn {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+#user-info {
+  display: flex;
+}
+
+#user-info>i {
+  align-self: flex-end;
+  margin-right: 2rem;
+}
