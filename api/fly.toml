@@ -1,6 +1,6 @@
-# fly.toml file generated for still-snow-130 on 2021-06-24T00:10:29+05:30
+# fly.toml file generated for summer-surf-7353 on 2021-06-24T11:42:20+05:30
 
-app = "still-snow-130"
+app = "summer-surf-7353"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
