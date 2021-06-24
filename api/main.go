@@ -150,7 +150,11 @@ func apiDirector(r *http.Request) {
 }
 
 func main() {
-	opts, err := redis.ParseURL(os.Getenv("FLY_REDIS_CACHE_URL"))
+	redis_url := os.Getenv("FLY_REDIS_CACHE_URL")
+	if redis_url == "" {
+		redis_url = "redis://127.0.0.1:6379"
+	}
+	opts, err := redis.ParseURL(redis_url)
 	if err != nil {
 		log.Fatal("failed to parse redis url: ", err)
 	}
