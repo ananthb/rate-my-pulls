@@ -1,13 +1,9 @@
-# fly.toml file generated for summer-surf-7353 on 2021-06-24T11:42:20+05:30
+# fly.toml file generated for solitary-haze-8639 on 2021-06-24T22:27:20+05:30
 
-app = "summer-surf-7353"
+app = "solitary-haze-8639"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
-
-[build]
-  builder = "paketobuildpacks/builder:base"
-  buildpacks = ["gcr.io/paketo-buildpacks/go"]
 
 [env]
   PORT = "8080"
@@ -40,3 +36,7 @@ kill_timeout = 5
     interval = "15s"
     restart_limit = 6
     timeout = "2s"
+
+[[statics]]
+  guest_path = "/public"
+  url_prefix = "/"

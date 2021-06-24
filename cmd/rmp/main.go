@@ -23,8 +23,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/json"
-	"errors"
+	"encoding/gob"
 	"io"
 	"log"
 	"net/http"
@@ -52,11 +51,6 @@ var (
 		Scopes:       []string{"user:email", "repo"},
 	}
 	sessionStore sessions.Store
-
-	// errors
-	mismatchedStateErr = errors.New("state does not match saved value from session")
-	stateMissingErr    = errors.New("no state value in session")
-	stateDecodeErr     = errors.New("error decoding state from session")
 )
 
 func randomState(n int) string {
@@ -96,20 +90,16 @@ func authCallback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	var savedState string
-	if rawState, ok := session.Values[oauthStateKey]; !ok {
-		http.Error(w, stateMissingErr.Error(), http.StatusInternalServerError)
+
+	savedState, ok := session.Values[oauthStateKey].(string)
+	if !ok {
+		http.Error(w, "no saved state present in session", http.StatusConflict)
 		return
-	} else {
-		if savedState, ok = rawState.(string); !ok {
-			http.Error(w, stateDecodeErr.Error(), http.StatusInternalServerError)
-			return
-		}
 	}
 
 	state := r.URL.Query().Get("state")
 	if state != savedState {
-		http.Error(w, mismatchedStateErr.Error(), http.StatusForbidden)
+		http.Error(w, "state does not matched saved value", http.StatusForbidden)
 		return
 	}
 
@@ -129,27 +119,37 @@ func authCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 
-func apiDirector(r *http.Request) {
+func githubGraphQLAPI(w http.ResponseWriter, r *http.Request) {
 	session, err := sessionStore.Get(r, sessionName)
 	if err != nil {
-		log.Fatalln(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	if rawToken, ok := session.Values[oauthTokenKey]; ok {
-		if rawTokenBytes, err := json.Marshal(rawToken); err == nil {
-			var token oauth2.Token
-			if err := json.Unmarshal(rawTokenBytes, &token); err == nil {
-				token.SetAuthHeader(r)
-			}
-		}
+	token, ok := session.Values[oauthTokenKey].(*oauth2.Token)
+	if !ok {
+		http.Error(w, "authentication token not found", http.StatusUnauthorized)
+		return
 	}
-	const host = "api.github.com"
-	r.Host = host
-	r.URL.Host = host
-	r.URL.Scheme = "https"
-	r.URL.Path = "/graphql"
+
+	token.SetAuthHeader(r)
+
+	proxy := httputil.ReverseProxy{
+		Director: func(r *http.Request) {
+			const host = "api.github.com"
+			r.Host = host
+			r.URL.Host = host
+			r.URL.Scheme = "https"
+			r.URL.Path = "/graphql"
+		},
+	}
+
+	proxy.ServeHTTP(w, r)
 }
 
 func main() {
+	// register types that will be serialized in sessions
+	gob.Register(&oauth2.Token{})
+
 	redis_url := os.Getenv("FLY_REDIS_CACHE_URL")
 	if redis_url == "" {
 		redis_url = "redis://127.0.0.1:6379"
@@ -167,9 +167,7 @@ func main() {
 	// url handlers
 	http.HandleFunc("/auth", auth)
 	http.HandleFunc("/auth/callback", authCallback)
-	http.Handle("/api", &httputil.ReverseProxy{
-		Director: apiDirector,
-	})
+	http.HandleFunc("/api", githubGraphQLAPI)
 
 	var address string
 	if port := os.Getenv("PORT"); port == "" {
