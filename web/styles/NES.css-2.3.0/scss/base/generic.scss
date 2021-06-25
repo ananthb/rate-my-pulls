@@ -18,9 +18,6 @@ body {
   color: $base-color;
   background-color: $background-color;
   -webkit-font-smoothing: antialiased;
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
 }
 
 label {

@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "repository": "https://github.com/ananthb/rate-my-pulls",
     "author": "Ananth Bhaskararaman <ananth@usc.ltd>",
-    "license": "UNLICENSED",
+    "license": "AGPL-3.0-only",
     "private": true,
     "devDependencies": {
         "@dillonkearns/elm-graphql": "^4.0.1",
