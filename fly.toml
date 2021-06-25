@@ -7,6 +7,7 @@ kill_timeout = 5
 
 [env]
   PORT = "8080"
+  RMP_GITHUB_CLIENT_ID = "Iv1.ed25fbeee7dbc811"
 
 [experimental]
   allowed_public_ports = []
