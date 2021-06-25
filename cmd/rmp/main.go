@@ -47,7 +47,7 @@ var (
 		ClientID:     os.Getenv("RMP_GITHUB_CLIENT_ID"),
 		ClientSecret: os.Getenv("RMP_GITHUB_CLIENT_SECRET"),
 		Endpoint:     github.Endpoint,
-		Scopes:       []string{"user:email", "repo"},
+		Scopes:       []string{},
 	}
 	sessionStore sessions.Store
 )

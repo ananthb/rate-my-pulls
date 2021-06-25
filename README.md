@@ -16,7 +16,7 @@ The full text of the license is available in the [LICENSE](./web/styles/NES.css-
 
 Copyright 2018 B.C.Rikko.
 
-### [Press Start 2P]
+### [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)
 Press Start 2P is a bitmap font based on the font design from 1980s Namco Arcade games.
 Press Start 2P is licensed under the [Open Font License](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL).
 
