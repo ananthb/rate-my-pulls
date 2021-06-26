@@ -1,0 +1,27 @@
+cabal-version:      2.4
+name:               rate-my-pulls
+version:            0.1.0.0
+synopsis: Tinder for your GitHub Pull Requests.
+description:
+  Share your pull requests for review with literally anyone on GitHub.
+  Swipe right and left with impunity. Super like code for the lulz!
+license: AGPL-3.0-only
+license-file: COPYING
+author: Ananth Bhaskararaman
+maintainer: lol@ratemypulls.dev
+copyright: Copyright 2020, Ananth Bhaskararaman
+category:  
+
+executable rmp
+    main-is:          Main.hs
+
+    -- Modules included in this executable, other than Main.
+    -- other-modules:
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:    
+        base ^>=4.15.0.0,
+        scotty ^>=0.12
+    hs-source-dirs:   rmp
+    default-language: Haskell2010

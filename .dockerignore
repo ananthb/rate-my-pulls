@@ -1,6 +1,11 @@
+# tools
 .git
 .gitignore
 .dockerignore
+Dockerfile
+# haskell
+dist-newstyle
+# web
 node_modules
 elm-stuff
 web/public/*.js*

@@ -1,3 +1,4 @@
+dist-newstyle
 node_modules
 elm-stuff
 web/public/*.js*

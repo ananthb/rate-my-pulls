@@ -15,19 +15,21 @@
 # License along with Rate My Pulls.  If not, see
 # <https://www.gnu.org/licenses/>.
 
-FROM docker.io/library/golang:1.16 as go_build
-WORKDIR /go/src/app
-COPY . .
-RUN go get -d -v ./...
-RUN go install ./...
-
 FROM docker.io/library/node:16 as node_build
 WORKDIR /app
 COPY web .
 RUN yarn install
 RUN yarn build
 
-FROM gcr.io/distroless/base
-COPY --from=go_build /go/bin/rmp /rmp
+FROM docker.io/library/haskell:9-buster as haskell_build
+RUN cabal update
+WORKDIR /app
+COPY ./rate-my-pulls.cabal .
+RUN cabal build --only-dependencies -j4
+COPY . .
+RUN cabal install
+
+FROM docker.io/library/debian:buster-slim
 COPY --from=node_build /app/public /public
+COPY --from=haskell_build /root/.cabal/bin/rmp /rmp
 ENTRYPOINT [ "/rmp" ]
