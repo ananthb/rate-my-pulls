@@ -15,30 +15,17 @@
    License along with Rate My Pulls.  If not, see
    <https://www.gnu.org/licenses/>.
 -}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE TypeOperators #-}
 
 module Main where
 
-import           Data.Aeson
+import           Api
 import           GHC.Generics
 import           Network.Wai
 import           Network.Wai.Handler.Warp
+import           Pull
 import           Servant
 import           System.IO
 
--- * api
-
-type PullsApi =
-  "pulls" :> Get '[JSON] [Pull] :<|>
-  "pulls" :> Capture "pullId" Integer :> Get '[JSON] Pull
-
-pullsApi :: Proxy PullsApi
-pullsApi = Proxy
-
--- * app
 
 main :: IO ()
 main = do
@@ -51,31 +38,3 @@ main = do
 
 mkApp :: IO Application
 mkApp = return $ serve pullsApi server
-
-server :: Server PullsApi
-server =
-  getPulls :<|>
-  getPullById
-
-getPulls :: Handler [Pull]
-getPulls = return [examplePull]
-
-getPullById :: Integer -> Handler Pull
-getPullById = \ case
-  0 -> return examplePull
-  _ -> throwError err404
-
-examplePull :: Pull
-examplePull = Pull 0 "example pull request"
-
--- * item
-
-data Pull
-  = Pull {
-    pullId :: Integer,
-    pullText :: String
-  }
-  deriving (Eq, Show, Generic)
-
-instance ToJSON Pull
-instance FromJSON Pull
