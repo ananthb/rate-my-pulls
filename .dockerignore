@@ -4,8 +4,8 @@
 .dockerignore
 Dockerfile
 # haskell
-dist-newstyle
+dist-newstyle/
 # web
-node_modules
-elm-stuff
+node_modules/
+elm-stuff/
 web/public/*.js*
