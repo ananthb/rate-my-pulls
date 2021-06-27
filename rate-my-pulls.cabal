@@ -21,7 +21,11 @@ executable rmp
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
     build-depends:    
+        aeson ^>=1.5.6.0,
         base ^>=4.15.0.0,
-        scotty ^>=0.12
+        servant ^>=0.18.3,
+        servant-server ^>=0.18.3,
+        wai ^>=3.2.3,
+        warp ^>=3.3.17
     hs-source-dirs:   rmp
     default-language: Haskell2010

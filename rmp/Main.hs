@@ -15,15 +15,67 @@
    License along with Rate My Pulls.  If not, see
    <https://www.gnu.org/licenses/>.
 -}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Main where
 
-import Web.Scotty
+import           Data.Aeson
+import           GHC.Generics
+import           Network.Wai
+import           Network.Wai.Handler.Warp
+import           Servant
+import           System.IO
 
-import Data.Monoid (mconcat)
+-- * api
 
-main = scotty 8080 $
-    get "/:word" $ do
-        beam <- param "word"
-        html $ mconcat ["<h1>Scotty, ", beam, " me up!</h1>"]
+type PullsApi =
+  "pulls" :> Get '[JSON] [Pull] :<|>
+  "pulls" :> Capture "pullId" Integer :> Get '[JSON] Pull
+
+pullsApi :: Proxy PullsApi
+pullsApi = Proxy
+
+-- * app
+
+main :: IO ()
+main = do
+  let port = 8080
+      settings =
+        setPort port $
+        setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port)) $
+        defaultSettings
+  runSettings settings =<< mkApp
+
+mkApp :: IO Application
+mkApp = return $ serve pullsApi server
+
+server :: Server PullsApi
+server =
+  getPulls :<|>
+  getPullById
+
+getPulls :: Handler [Pull]
+getPulls = return [examplePull]
+
+getPullById :: Integer -> Handler Pull
+getPullById = \ case
+  0 -> return examplePull
+  _ -> throwError err404
+
+examplePull :: Pull
+examplePull = Pull 0 "example pull request"
+
+-- * item
+
+data Pull
+  = Pull {
+    pullId :: Integer,
+    pullText :: String
+  }
+  deriving (Eq, Show, Generic)
+
+instance ToJSON Pull
+instance FromJSON Pull
