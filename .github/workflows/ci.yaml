@@ -28,6 +28,14 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - uses: actions/cache@v2
+        with:
+          path: ~/.local
+          key: poetry-0
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -36,9 +44,6 @@ jobs:
         run: |
           npm ci
           npm run build
-      - uses: abatilo/actions-poetry@v2.0.0
-        with:
-          poetry-version: ${{ env.POETRY_VERSION }}
       - run: |
           poetry install
           poetry run black . --check
