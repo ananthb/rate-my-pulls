@@ -24,8 +24,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-qemu-action@v1
-      - run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-8)" >>"$GITHUB_ENV"
-      - uses: redhat-actions/buildah-build@v2
+      - name: Calculate short SHA
+        run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-8)" >>"$GITHUB_ENV"
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
         id: build_image
         with:
           image: ${{ env.IMAGE_NAME }}
@@ -40,7 +42,8 @@ jobs:
             ${{ github.sha }}
             ${{ github.event.release.tag_name }}
           containerfiles: ./Containerfile
-      - uses: redhat-actions/push-to-registry@v2
+      - name: Push image to registry
+        uses: redhat-actions/push-to-registry@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
