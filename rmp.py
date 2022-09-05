@@ -22,7 +22,7 @@ from typing import Union
 
 from fastapi import FastAPI
 from pydantic import BaseSettings
-from starlette_cramjam.middleware import CompressionMiddleware
+from starlette_cramjam.middleware import CompressionMiddleware  # type: ignore
 from starlette_prometheus import metrics, PrometheusMiddleware
 
 
