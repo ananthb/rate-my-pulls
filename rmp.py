@@ -44,6 +44,6 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 
 def main() -> None:
-    import uvicorn # type: ignore
+    import uvicorn  # type: ignore
 
     uvicorn.run(app, settings.host, settings.port)
