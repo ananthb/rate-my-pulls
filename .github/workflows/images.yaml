@@ -22,8 +22,10 @@ jobs:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: docker/setup-qemu-action@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
       - name: Calculate short SHA
         run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-8)" >>"$GITHUB_ENV"
       - name: Build container image

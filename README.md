@@ -1,6 +1,6 @@
 # Rate My Pulls
 
-[![ci](https://github.com/ananthb/rate-my-pulls/actions/workflows/ci.yaml/badge.svg)](https://github.com/ananthb/rate-my-pulls/actions/workflows/ci.yaml)
+[![CI](https://github.com/ananthb/rate-my-pulls/actions/workflows/ci.yaml/badge.svg)](https://github.com/ananthb/rate-my-pulls/actions/workflows/ci.yaml)
 
 
 Tinder for your pull requests.

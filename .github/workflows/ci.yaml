@@ -1,4 +1,4 @@
-name: ci
+name: CI
 
 on:
   push:
@@ -22,8 +22,10 @@ jobs:
     name: Test, lint, and build everything.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup nodejs
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -37,15 +39,18 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VERSION }}
-      - uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: poetry
-      - working-directory: web
+      - name: Build web site
+        working-directory: web
         run: |
           npm ci
           npm run build
-      - run: |
+      - name: Lint and test Python code
+        run: |
           poetry install
           poetry run black . --check
           poetry run mypy .
