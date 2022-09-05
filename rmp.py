@@ -22,6 +22,8 @@ from typing import Union
 
 from fastapi import FastAPI
 from pydantic import BaseSettings
+from starlette_cramjam.middleware import CompressionMiddleware
+from starlette_prometheus import metrics, PrometheusMiddleware
 
 
 class Settings(BaseSettings):
@@ -31,6 +33,12 @@ class Settings(BaseSettings):
 
 settings = Settings()
 app = FastAPI()
+app.add_middleware(PrometheusMiddleware, filter_unhandled_paths=True)
+app.add_middleware(CompressionMiddleware)
+
+## HANDLERS
+
+app.add_route("/metrics", metrics)
 
 
 @app.get("/")
@@ -46,4 +54,4 @@ def read_item(item_id: int, q: Union[str, None] = None):
 def main() -> None:
     import uvicorn  # type: ignore
 
-    uvicorn.run(app, settings.host, settings.port)
+    uvicorn.run(app, host=settings.host, port=settings.port)

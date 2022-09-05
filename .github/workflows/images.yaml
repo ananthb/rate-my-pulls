@@ -1,4 +1,4 @@
-name: images
+name: Container Images
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 
 jobs:
   container_images:
-    name: Build and publish OCI container images.
+    name: Build and publish OCI Container Images.
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}

@@ -44,6 +44,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: poetry
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
       - name: Build web site
         working-directory: web
         run: |

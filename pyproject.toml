@@ -12,6 +12,8 @@ rmp = "rmp:main"
 python = "^3.10"
 fastapi = "^0.82.0"
 uvicorn = {extras = ["standard"], version = "^0.18.3"}
+starlette-cramjam = "^0.3.0"
+starlette-prometheus = "^0.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
