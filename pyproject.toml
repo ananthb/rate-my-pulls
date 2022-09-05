@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "rmp"
+version = "0.1.0"
+description = ""
+authors = ["Ananth <rate-my-pulls@kedi.dev>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+rmp = "rmp:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.82.0"
+uvicorn = {extras = ["standard"], version = "^0.18.3"}
+
+
+[tool.poetry.group.dev.dependencies]
+black = {version = "^22.8.0", allow-prereleases = true}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

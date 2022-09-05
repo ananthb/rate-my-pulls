@@ -1,0 +1,5 @@
+__pycache__
+node_modules
+elm-stuff
+web/public/*.js*
+web/public/*.css*
