@@ -1,10 +1,11 @@
 ARG PYTHON_VERSION=3.10.6
 ARG POETRY_VERSION=1.2.0
 ARG NODE_VERSION=18.8.0
+ARG NODE_ENV=production
 
 # NODEJS BUILDER
 FROM docker.io/library/node:${NODE_VERSION} as js_builder
-ENV NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 WORKDIR /web
 COPY ./web .
 RUN npm ci

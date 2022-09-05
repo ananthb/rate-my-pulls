@@ -1,0 +1,49 @@
+name: images
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  PYTHON_VERSION: 3.10.6
+  POETRY_VERSION: 1.2.0
+  NODE_VERSION: 18.8.0
+  NODE_ENV: production
+
+jobs:
+  container_images:
+    name: Build and publish OCI container images.
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/setup-qemu-action@v1
+      - run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-8)" >>"$GITHUB_ENV"
+      - uses: redhat-actions/buildah-build@v2
+        id: build_image
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          build-args: |
+            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
+            POETRY_VERSION=${{ env.POETRY_VERSION }}
+            NODE_VERSION=${{ env.NODE_VERSION }}
+            NODE_ENV=${{ env.NODE_ENV }}
+          tags: >
+            latest
+            ${{ env.SHORT_SHA }}
+            ${{ github.sha }}
+            ${{ github.event.release.tag_name }}
+          containerfiles: ./Containerfile
+      - uses: redhat-actions/push-to-registry@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          image: ${{ steps.build_image.outputs.image }}
+          tags: ${{ steps.build_image.outputs.tags }}

@@ -1,4 +1,6 @@
 __pycache__
+.mypy_cache
+.ruff_cache
 node_modules
 elm-stuff
 web/public/*.js*

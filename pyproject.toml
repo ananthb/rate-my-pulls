@@ -16,6 +16,8 @@ uvicorn = {extras = ["standard"], version = "^0.18.3"}
 
 [tool.poetry.group.dev.dependencies]
 black = {version = "^22.8.0", allow-prereleases = true}
+ruff = "^0.0.25"
+mypy = "^0.971"
 
 [build-system]
 requires = ["poetry-core"]
