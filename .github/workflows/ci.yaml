@@ -46,6 +46,8 @@ jobs:
           cache: poetry
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
       - name: Build web site
         working-directory: web
         run: |
