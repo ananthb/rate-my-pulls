@@ -45,7 +45,8 @@ ENV WEB_DIR="/public" \
 EXPOSE $PORT
 ENTRYPOINT ["python"]
 CMD ["-m", "rmp"]
+WORKDIR /app
 ## APP
 COPY --from=js_builder /web/public /public
-COPY --from=py_builder /app /app
-COPY . /app
+COPY --from=py_builder /app ./
+COPY . ./
