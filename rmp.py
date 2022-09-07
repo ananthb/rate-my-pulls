@@ -18,7 +18,7 @@
    <https://www.gnu.org/licenses/>.
 
 """
-from pathlib import Path, PurePath
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI
