@@ -31,14 +31,14 @@ from starlette_prometheus import PrometheusMiddleware, metrics
 class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
-    web_dir: Path = PurePath("web/public")
+    web_dir: Path = Path("web/public")
 
     class Config(BaseConfig):
         @classmethod
-        def parse_env_var(cls, field_name: str, raw_value: str) -> Any:
+        def parse_env_var(cls, field_name: str, raw_val: str) -> Any:
             if field_name == "web_dir":
-                return PurePath(raw_value)
-            return super().parse_env_var(field_name, raw_value)
+                return Path(raw_val)
+            return cls.json_loads(raw_val)
 
 
 settings = Settings()
