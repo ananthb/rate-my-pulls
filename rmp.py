@@ -53,7 +53,7 @@ app.add_middleware(CompressionMiddleware)
 app.add_route("/metrics", metrics)
 
 
-@app.route("/health")
+@app.get("/health")
 def health() -> str:
     return "ok"
 
