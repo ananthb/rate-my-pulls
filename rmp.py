@@ -18,18 +18,27 @@
    <https://www.gnu.org/licenses/>.
 
 """
-from typing import Union
+from pathlib import Path, PurePath
+from typing import Any
 
 from fastapi import FastAPI
-from pydantic import BaseSettings
-from starlette_cramjam.middleware import CompressionMiddleware  # type: ignore
-from starlette_prometheus import metrics, PrometheusMiddleware
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseConfig, BaseSettings
+from starlette_cramjam.middleware import CompressionMiddleware  # type: ignore
+from starlette_prometheus import PrometheusMiddleware, metrics
 
 
 class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
+    web_dir: Path = PurePath("web/public")
+
+    class Config(BaseConfig):
+        @classmethod
+        def parse_env_var(cls, field_name: str, raw_value: str) -> Any:
+            if field_name == "web_dir":
+                return PurePath(raw_value)
+            return super().parse_env_var(field_name, raw_value)
 
 
 settings = Settings()
@@ -43,9 +52,15 @@ app.add_middleware(CompressionMiddleware)
 
 app.add_route("/metrics", metrics)
 
+
+@app.route("/health")
+def health() -> str:
+    return "ok"
+
+
 app.mount(
     "/",
-    StaticFiles(directory="web/public", html=True),
+    StaticFiles(directory=settings.web_dir, html=True),
     name="web",
 )
 

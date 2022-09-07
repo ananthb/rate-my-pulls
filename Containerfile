@@ -36,7 +36,8 @@ RUN poetry install --only main
 
 # RUNTIME
 FROM docker.io/library/python:${PYTHON_VERSION}-slim as runtime
-ENV PATH=/app/.venv/bin:$PATH \
+ENV WEB_DIR="/public" \
+  PATH=/app/.venv/bin:$PATH \
   PYTHONPATH=/app:$PYTHONPATH \
   PYTHONUNBUFFERED=1 \
   PYTHONDONTWRITEBYTECODE=1 \

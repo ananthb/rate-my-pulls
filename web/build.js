@@ -23,6 +23,7 @@ esbuild.build({
   plugins: [
     sassPlugin({
       precompile(source, pathname) {
+        // replace url(./relative-path) with url(/absolute-path)
         const basedir = path.dirname(pathname)
         return source.replace(/(url\(['"]?)(\.\.?\/)([^'")]+['"]?\))/g, `$1${basedir}/$2$3`)
       }
