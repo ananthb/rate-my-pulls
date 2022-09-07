@@ -42,7 +42,7 @@ jobs:
             latest
             ${{ env.SHORT_SHA }}
             ${{ github.sha }}
-            ${{ github.event.release.tag_name }}
+            ${{ github.ref_name }}
           containerfiles: ./Containerfile
       - name: Push image to registry
         uses: redhat-actions/push-to-registry@v2
