@@ -24,6 +24,7 @@ from fastapi import FastAPI
 from pydantic import BaseSettings
 from starlette_cramjam.middleware import CompressionMiddleware  # type: ignore
 from starlette_prometheus import metrics, PrometheusMiddleware
+from fastapi.staticfiles import StaticFiles
 
 
 class Settings(BaseSettings):
@@ -32,6 +33,8 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# APP
 app = FastAPI()
 app.add_middleware(PrometheusMiddleware, filter_unhandled_paths=True)
 app.add_middleware(CompressionMiddleware)
@@ -40,15 +43,11 @@ app.add_middleware(CompressionMiddleware)
 
 app.add_route("/metrics", metrics)
 
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+app.mount(
+    "/",
+    StaticFiles(directory="web/public", html=True),
+    name="web",
+)
 
 
 def main() -> None:

@@ -1,4 +1,4 @@
-@charset "utf-8";
+@charset "UTF-8";
 /* Copyright 2022, Ananth <rate-my-pulls@kedi.dev>
 
    This file is part of Rate My Pulls.
@@ -17,4 +17,31 @@
 	 <https://www.gnu.org/licenses/>.
 */
 
-@import "header.scss";
+#site-header {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  margin: 0 auto;
+  width: 80%;
+}
+
+#site-nav {
+  margin: 1rem;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+}
+
+#site-nav>.nes-btn {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+#user-info {
+  display: flex;
+}
+
+#user-info>i {
+  align-self: flex-end;
+  margin-right: 2rem;
+}

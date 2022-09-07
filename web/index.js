@@ -16,7 +16,7 @@
    <https://www.gnu.org/licenses/>.
 */
 
-import Elm from "./src/Main.elm";
+import { Elm } from "src/Main.elm";
 
 document.addEventListener("DOMContentLoaded", () => {
     Elm.Main.init();

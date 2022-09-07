@@ -21,12 +21,10 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (Html, a, div, section, text)
-import Html.Attributes exposing (class, for, href, id, type_)
-import Html.Events exposing (onClick, onInput)
-import Http
+import Html exposing (Html, a, div, p, section, text)
+import Html.Attributes exposing (class, href, id, target, type_)
 import Url
-import Url.Parser as Parser exposing ((</>), (<?>), parse)
+import Url.Parser as Parser exposing (parse)
 
 
 
@@ -126,11 +124,19 @@ view : Model -> Browser.Document Msg
 view model =
     let
         footer =
-            Html.span []
-                [ a [ href "https://git.sr.ht/~ananth/rate-my-pulls" ]
-                    [ text "Rate My Pulls Source Code" ]
-                , text "Hosted on "
-                , a [ href "https://sr.ht" ] [ text "SourceHut!" ]
+            Html.footer []
+                [ p []
+                    [ text "View "
+                    , a
+                        [ href "https://github.com/ananthb/rate-my-pulls"
+                        , target "_blank"
+                        ]
+                        [ text "Source Code." ]
+                    ]
+                , p []
+                    [ text "Hosted on "
+                    , a [ href "https://fly.dev", target "_blank" ] [ text "Fly.io!" ]
+                    ]
                 ]
     in
     { title = "Rate My Pulls"
