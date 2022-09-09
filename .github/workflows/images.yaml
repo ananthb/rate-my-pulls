@@ -6,9 +6,8 @@ on:
       - "v*"
 
 env:
-  PYTHON_VERSION: 3.10.6
-  POETRY_VERSION: 1.2.0
   NODE_VERSION: 18.8.0
+  PYTHON_VERSION: 3.10.6
   NODE_ENV: production
 
 jobs:
@@ -34,9 +33,8 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           build-args: |
-            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
-            POETRY_VERSION=${{ env.POETRY_VERSION }}
             NODE_VERSION=${{ env.NODE_VERSION }}
+            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
             NODE_ENV=${{ env.NODE_ENV }}
           tags: >
             latest
