@@ -1,4 +1,4 @@
-name: Container Images
+name: OCI Container Images
 
 on:
   push:
