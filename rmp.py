@@ -20,7 +20,7 @@
 """
 from pathlib import Path
 
-from aiohttp_oauthlib import OAuth2Session
+from aiohttp_oauthlib import OAuth2Session  # type: ignore
 from fastapi import FastAPI
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
@@ -106,7 +106,7 @@ async def auth_callback(request: Request) -> RedirectResponse:
         client_secret=str(GITHUB_OAUTH_CLIENT_SECRET),
         authorization_response=request.url,
     )
-    del request.sesssion["oauth_state"]
+    del request.session["oauth_state"]
     request.session["token"] = token
     return RedirectResponse("/")
 
