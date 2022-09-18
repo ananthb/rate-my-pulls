@@ -9,8 +9,8 @@ Match with a user if you've swiped right on their code and vice-versa.
 
 ## URLs
 
-- Website - [https://rate-my-pulls.fky.dev](https://rate-my-pulls.fly.dev)
-- Source Hut Mirror - [https://git.sr.ht/~ananth/rate-my-pulls](https://git.sr.ht/~ananth/rate-my-pulls)
+- Website - [rate-my-pulls.fly.dev](https://rate-my-pulls.fly.dev)
+- Source Hut Mirror - [git.sr.ht/~ananth/rate-my-pulls](https://git.sr.ht/~ananth/rate-my-pulls)
 
 ## Acknowledgements
 
