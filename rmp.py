@@ -81,7 +81,7 @@ app.mount(
 )
 
 
-@app.post("/auth", response_class=RedirectResponse)
+@app.get("/auth", response_class=RedirectResponse)
 def auth(request: Request) -> RedirectResponse:
     """auth starts the GitHub OAuth flow"""
     gh_session = OAuth2Session(
