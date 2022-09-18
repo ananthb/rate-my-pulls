@@ -1,6 +1,6 @@
 # Rate My Pulls
 
-[![CI](https://github.com/ananthb/rate-my-pulls/actions/workflows/ci.yaml/badge.svg)](https://github.com/ananthb/rate-my-pulls/actions/workflows/ci.yaml)
+[![Continous Integration](https://github.com/ananthb/rate-my-pulls/actions/workflows/ci.yaml/badge.svg)](https://github.com/ananthb/rate-my-pulls/actions/workflows/ci.yaml) [![OCI Container Images](https://github.com/ananthb/rate-my-pulls/actions/workflows/images.yaml/badge.svg)](https://github.com/ananthb/rate-my-pulls/actions/workflows/images.yaml)
 
 
 Tinder for your pull requests.
