@@ -35,7 +35,7 @@ from starsessions import SessionAutoloadMiddleware, SessionMiddleware
 from starsessions.stores.redis import RedisStore
 
 # CONFIG
-config = Config()
+config = Config("env")
 
 HOST = config("HOST", cast=str, default="127.0.0.1")
 PORT = config("PORT", cast=int, default=8000)
@@ -164,3 +164,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

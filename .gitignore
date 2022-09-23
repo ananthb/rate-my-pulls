@@ -5,3 +5,4 @@ node_modules
 elm-stuff
 web/public/*.js*
 web/public/*.css*
+env
